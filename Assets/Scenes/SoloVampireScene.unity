@@ -140,7 +140,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxSpeed: 2
-  shouldFaceDirection: 1
+  canRotate: 1
 --- !u!4 &327788741 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a11cb20fb31f54c4aad5904936f9d6e8, type: 3}
@@ -253,7 +253,7 @@ GameObject:
   - component: {fileID: 868309494}
   - component: {fileID: 868309493}
   m_Layer: 0
-  m_Name: Plane
+  m_Name: ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -575,5 +575,5 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 705507995}
-  - {fileID: 1682276864}
   - {fileID: 868309496}
+  - {fileID: 1682276864}

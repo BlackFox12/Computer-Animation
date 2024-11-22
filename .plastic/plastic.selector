@@ -1,4 +1,0 @@
-repository "Computer Animation@ludwigfranklin@cloud"
-  path "/"
-    br "/main"
-    co "/main"
