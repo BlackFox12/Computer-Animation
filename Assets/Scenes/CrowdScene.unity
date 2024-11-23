@@ -207,13 +207,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 181426842}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.38268343, y: 0, z: 0, w: 0.92387956}
-  m_LocalPosition: {x: 0, y: 30, z: -45}
+  m_LocalRotation: {x: 0.40034905, y: 0, z: 0, w: 0.91636276}
+  m_LocalPosition: {x: 0, y: 18.6, z: -25.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 45, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 47.2, y: 0, z: 0}
 --- !u!1 &240980258
 GameObject:
   m_ObjectHideFlags: 0
@@ -320,6 +320,7 @@ GameObject:
   - component: {fileID: 1523707497}
   - component: {fileID: 1523707496}
   - component: {fileID: 1523707495}
+  - component: {fileID: 1523707499}
   - component: {fileID: 1523707494}
   m_Layer: 0
   m_Name: Ground
@@ -340,8 +341,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f6a90d0725f6bd44ac28c848b905d26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentAmount: 10
-  character: {fileID: 2603355516459568202, guid: d677344cbef052f418a2cda1fdf60735, type: 3}
+  agentAmount: 40
+  characterPrefab: {fileID: 8781371480621895646, guid: 9c7969e40b2707b41be70d03cae3f8a5, type: 3}
 --- !u!64 &1523707495
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -424,11 +425,25 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 7, y: 7, z: 7}
+  m_LocalScale: {x: 4, y: 4, z: 4}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1523707499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1523707493}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3b594b87ff0e41498a1307da8d49aaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  instantiator: {fileID: 1523707494}
+  timestep: 0.01
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
