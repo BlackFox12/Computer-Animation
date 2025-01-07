@@ -321,7 +321,7 @@ GameObject:
   - component: {fileID: 1523707496}
   - component: {fileID: 1523707495}
   - component: {fileID: 1523707499}
-  - component: {fileID: 1523707494}
+  - component: {fileID: 1523707500}
   m_Layer: 0
   m_Name: Ground
   m_TagString: Untagged
@@ -329,20 +329,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1523707494
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1523707493}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f6a90d0725f6bd44ac28c848b905d26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  agentAmount: 40
-  characterPrefab: {fileID: 8781371480621895646, guid: 9c7969e40b2707b41be70d03cae3f8a5, type: 3}
 --- !u!64 &1523707495
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -442,8 +428,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3b594b87ff0e41498a1307da8d49aaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  instantiator: {fileID: 1523707494}
+  instantiator: {fileID: 1523707500}
   timestep: 0.01
+--- !u!114 &1523707500
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1523707493}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa9b84c2a780057498ceba39259fb282, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentAmount: 20
+  characterPrefab: {fileID: 8781371480621895646, guid: 9c7969e40b2707b41be70d03cae3f8a5, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

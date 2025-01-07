@@ -1,25 +1,33 @@
 using UnityEngine;
 
-public class VampireAnimationController : MonoBehaviour
+public class A_StarVampireAnimationController : MonoBehaviour
 {
     private Animator animator;
-    private Agent agent;
+    private AStarAgent agent;
 
     void Start()
     {
         animator = GetComponent<Animator>();
-        agent = GetComponent<Agent>();
+        agent = GetComponent<AStarAgent>();
+
+        if (animator == null)
+            Debug.LogError("No Animator component found on vampire!");
+        if (agent == null)
+            Debug.LogError("No AStarAgent component found on vampire!");
     }
 
     void Update()
     {
+        if (animator == null || agent == null) return;
+
         UpdateAnimationParameters();
     }
 
     private void UpdateAnimationParameters()
     {
         // Calculate movement vector and speed
-        Vector3 movement = agent.targetPosition - transform.position;
+        Vector3 targetPos = agent.GetTargetPosition();
+        Vector3 movement = targetPos - transform.position;
         float speed = movement.magnitude / Time.deltaTime;
 
         // Convert movement direction to local space
@@ -29,7 +37,7 @@ public class VampireAnimationController : MonoBehaviour
         animator.SetFloat("Vel_x", localDirection.x);
         animator.SetFloat("Vel_z", localDirection.z);
         animator.SetFloat("Speed_multiplier", Mathf.Clamp01(speed / agent.velocity));
-        animator.SetBool("isIdle", speed < 0.1f);
+        animator.SetBool("isIdle", agent.IsPathComplete() || speed < 0.1f);
 
         // Rotate character to face movement direction
         if (speed > 0.1f)
@@ -38,4 +46,4 @@ public class VampireAnimationController : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
         }
     }
-}
+} 

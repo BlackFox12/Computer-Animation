@@ -24,6 +24,6 @@ public class PathManager : MonoBehaviour
     // Check if the agent reached its goal
     public bool IsGoalReached(Agent agent)
     {
-        return Vector3.Distance(agent.transform.position, agent.targetPosition) < agent.radius + (bufferRadius*agent.velocity);
+        return Vector3.Distance(agent.transform.position, agent.targetPosition) < agent.radius + (bufferRadius * agent.velocity);
     }
 }

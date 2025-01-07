@@ -4,112 +4,106 @@ using PathFinding;
 
 public class Grid : FiniteGraph<GridCell, CellConnection, GridConnections>
 {
-    protected float xMin;
-    protected float xMax;
-    protected float zMin;
-    protected float zMax;
+    protected Vector3 center;
+    protected Vector3 scale;
     protected float sizeOfCell;
     protected float gridHeight;
     protected int numRows;
     protected int numColumns;
 
-    public GameObject obstaclePrefab; // Assign this in the Unity Editor
+    public GameObject obstaclePrefab;
+    public GameObject characterPrefab;
 
-    public Grid(float minX, float maxX, float minZ, float maxZ, float cellSize, float height = 0, GameObject obstaclePrefab = null)
+    public Grid(float cellSize, Vector3 center, Vector3 scale, GameObject obstaclePrefab = null, GameObject charPrefab = null, GameObject existingPlane = null)
     {
-        xMin = minX;
-        xMax = maxX;
-        zMin = minZ;
-        zMax = maxZ;
+        this.center = center;
+        this.scale = scale;
         sizeOfCell = cellSize;
-        gridHeight = height;
+        gridHeight = center.y;
+        characterPrefab = charPrefab;
 
-        numRows = Mathf.CeilToInt((zMax - zMin) / sizeOfCell);
-        numColumns = Mathf.CeilToInt((xMax - xMin) / sizeOfCell);
+        // Calculate number of rows and columns based on scale
+        numRows = Mathf.CeilToInt(scale.z * 10 / sizeOfCell);    // Plane is 10 units by default
+        numColumns = Mathf.CeilToInt(scale.x * 10 / sizeOfCell); // Plane is 10 units by default
 
         nodes = new List<GridCell>();
         connections = new List<GridConnections>();
         this.obstaclePrefab = obstaclePrefab;
-    
-        GameObject floorPlane = GameObject.CreatePrimitive(PrimitiveType.Plane);
-        float gridWidth = xMax - xMin;
-        float gridDepth = zMax - zMin;
-
-        
-        Vector3 planeCenter = new Vector3(xMin + gridWidth / 2, -sizeOfCell, zMin + gridDepth / 2);
-        floorPlane.transform.position = planeCenter;
-
-        
-        floorPlane.transform.localScale = new Vector3(gridWidth / 10f, 1, gridDepth / 10f);
-
-        
-        Renderer planeRenderer = floorPlane.GetComponent<Renderer>();
-        planeRenderer.material.color = new Color(0.8f, 0.8f, 0.8f, 1f); // Light gray
 
         GenerateGrid();
     }
 
     protected void GenerateGrid()
     {
+        // Calculate the total width and height of the plane
+        float totalWidth = scale.x * 10;  // Plane is 10 units by default
+        float totalDepth = scale.z * 10;  // Plane is 10 units by default
+
+        // Calculate start positions at the edge of the plane
+        float startX = center.x - totalWidth/2;
+        float startZ = center.z - totalDepth/2;
+
+        // First, create all cells
         for (int row = 0; row < numRows; row++)
         {
             for (int col = 0; col < numColumns; col++)
             {
-                float x = xMin + col * sizeOfCell + sizeOfCell / 2;
-                float z = zMin + row * sizeOfCell + sizeOfCell / 2;
-                Vector3 center = new Vector3(x, gridHeight, z);
+                float x = startX + col * sizeOfCell + sizeOfCell / 2;
+                float z = startZ + row * sizeOfCell + sizeOfCell / 2;
+                Vector3 cellCenter = new Vector3(x, gridHeight, z);
 
                 bool isObstacle = Random.Range(0f, 1f) <= 0.3f;
 
-                GridCell cell = new GridCell(col + numColumns * row, center, isObstacle);
+                GridCell cell = new GridCell(col + numColumns * row, cellCenter, isObstacle);
                 nodes.Add(cell);
 
                 if (isObstacle && obstaclePrefab != null)
                 {
-                    GameObject obstacle = GameObject.Instantiate(obstaclePrefab, center, Quaternion.identity);
+                    GameObject obstacle = GameObject.Instantiate(obstaclePrefab, cellCenter, Quaternion.identity);
                     obstacle.transform.localScale = new Vector3(sizeOfCell, sizeOfCell, sizeOfCell);
                 }
 
-                var cellConnections = new GridConnections();
-                AddConnections(cell, row, col, cellConnections);
-                connections.Add(cellConnections);
+                connections.Add(new GridConnections());
             }
         }
-    }
 
-    protected void AddConnections(GridCell cell, int row, int col, GridConnections cellConnections)
-    {
-        // Define directions for potential neighbors
-        var directions = new List<Vector2Int>
-    {
-        new Vector2Int(0, 1),  // Up
-        new Vector2Int(1, 0),  // Right
-        new Vector2Int(0, -1), // Down
-        new Vector2Int(-1, 0)  // Left
-    };
-
-        foreach (var dir in directions)
+        // Then, create connections for each cell
+        for (int row = 0; row < numRows; row++)
         {
-            int neighborRow = row + dir.y;
-            int neighborCol = col + dir.x;
-
-            // Check if the neighbor is within grid bounds
-            if (neighborRow >= 0 && neighborRow < numRows &&
-                neighborCol >= 0 && neighborCol < numColumns)
+            for (int col = 0; col < numColumns; col++)
             {
-                int neighborIndex = neighborRow * numColumns + neighborCol;
+                int currentIndex = col + numColumns * row;
+                GridCell currentCell = nodes[currentIndex];
+                
+                if (currentCell.IsOccupied)
+                    continue;
 
-                // Ensure the neighborIndex is valid
-                if (neighborIndex >= 0 && neighborIndex < nodes.Count)
+                // Define all eight directions (including diagonals)
+                var directions = new (int dx, int dy)[]
                 {
-                    GridCell neighbor = nodes[neighborIndex];
+                    (-1, -1), (0, -1), (1, -1),  // Top row
+                    (-1,  0),          (1,  0),  // Middle row
+                    (-1,  1), (0,  1), (1,  1)   // Bottom row
+                };
 
-                    // Create connection if the neighbor is not an obstacle
-                    if (!neighbor.IsOccupied)
+                foreach (var dir in directions)
+                {
+                    int newRow = row + dir.dy;
+                    int newCol = col + dir.dx;
+
+                    // Check if the neighbor is within bounds
+                    if (newRow >= 0 && newRow < numRows && newCol >= 0 && newCol < numColumns)
                     {
-                        var connection = new CellConnection(cell, neighbor);
-                        connection.setCost(Vector3.Distance(cell.center, neighbor.center));
-                        cellConnections.connections.Add(connection);
+                        int neighborIndex = newCol + numColumns * newRow;
+                        GridCell neighbor = nodes[neighborIndex];
+
+                        if (!neighbor.IsOccupied)
+                        {
+                            float cost = (dir.dx != 0 && dir.dy != 0) ? 1.414f : 1f; // Diagonal cost vs straight cost
+                            var connection = new CellConnection(currentCell, neighbor);
+                            connection.setCost(cost);
+                            connections[currentIndex].connections.Add(connection);
+                        }
                     }
                 }
             }
