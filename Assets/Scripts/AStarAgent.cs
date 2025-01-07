@@ -13,11 +13,14 @@ public class AStarAgent : MonoBehaviour
     private Animator animator;
     private Vector3 targetPosition;
     private GridManager gridManager;
+    private AStarPathfinder pathfinder;
 
     void Start()
     {
         animator = GetComponent<Animator>();
         gridManager = FindObjectOfType<GridManager>();
+        pathfinder = PathfindingManager.Instance?.GetPathfinder();
+        
         // Set initial node index based on spawn position
         if (gridManager != null)
         {
@@ -25,11 +28,7 @@ public class AStarAgent : MonoBehaviour
             if (nearestCell != null)
             {
                 currentNodeIndex = nearestCell.getId();
-                targetPosition = transform.position; // Initialize target position
-            }
-            else
-            {
-                Debug.LogError("Could not find valid starting cell for agent!");
+                targetPosition = transform.position;
             }
         }
     }
@@ -101,5 +100,68 @@ public class AStarAgent : MonoBehaviour
             animator.SetFloat("Speed_multiplier", distanceToTarget > 0.1f ? 1f : 0f);
             animator.SetBool("isIdle", distanceToTarget <= 0.1f);
         }
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        if (!Application.isPlaying || pathfinder == null) return;
+
+        // Draw visited nodes
+        var visitedNodes = pathfinder.GetVisitedNodes();
+        if (visitedNodes != null)
+        {
+            foreach (GridCell cell in visitedNodes)
+            {
+                if (cell == null) continue;
+
+                // Draw OPEN nodes in green
+                if (pathfinder.IsInOpenSet(cell))
+                {
+                    Gizmos.color = new Color(0, 1, 0, 0.3f);
+                    DrawCell(cell);
+                }
+                // Draw CLOSED nodes in red
+                else if (pathfinder.IsInClosedSet(cell))
+                {
+                    Gizmos.color = new Color(1, 0, 0, 0.3f);
+                    DrawCell(cell);
+                }
+            }
+        }
+
+        // Draw path in yellow
+        if (pathNodes != null && pathNodes.Count > 0)
+        {
+            Gizmos.color = Color.yellow;
+            for (int i = 0; i < pathNodes.Count - 1; i++)
+            {
+                if (pathNodes[i] == null || pathNodes[i + 1] == null) continue;
+                Gizmos.DrawLine(pathNodes[i].center + Vector3.up * 0.1f, 
+                              pathNodes[i + 1].center + Vector3.up * 0.1f);
+                DrawCell(pathNodes[i]);
+            }
+            if (pathNodes[pathNodes.Count - 1] != null)
+            {
+                DrawCell(pathNodes[pathNodes.Count - 1]);
+            }
+        }
+
+        // Draw goal in teal
+        if (targetNodeIndex >= 0 && gridManager != null)
+        {
+            GridCell goalCell = gridManager.GetGrid()?.getNode(targetNodeIndex);
+            if (goalCell != null)
+            {
+                Gizmos.color = new Color(0, 1, 1, 0.5f); // Teal
+                Gizmos.DrawWireSphere(goalCell.center + Vector3.up * 0.1f, radius);
+            }
+        }
+    }
+
+    private void DrawCell(GridCell cell)
+    {
+        if (cell == null) return;
+        Vector3 size = new Vector3(1f, 0.1f, 1f); // Assuming 1 unit cell size
+        Gizmos.DrawCube(cell.center + Vector3.up * 0.05f, size);
     }
 } 

@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class PathfindingManager : MonoBehaviour
 {
@@ -9,12 +10,14 @@ public class PathfindingManager : MonoBehaviour
     public AStarPathfinder pathfinder;
     public AStarSimulator simulator;
 
+    public bool IsInitialized { get; private set; }
+
     void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            InitializeComponents();
+            StartCoroutine(InitializeComponents());
         }
         else
         {
@@ -22,8 +25,28 @@ public class PathfindingManager : MonoBehaviour
         }
     }
 
-    private void InitializeComponents()
+    private IEnumerator InitializeComponents()
     {
+        IsInitialized = false;
+
+        // Find or wait for GridManager
+        while (gridManager == null)
+        {
+            gridManager = FindObjectOfType<GridManager>();
+            if (gridManager == null)
+            {
+                Debug.Log("Waiting for GridManager...");
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+
+        // Wait for grid to be initialized
+        while (gridManager.GetGrid() == null)
+        {
+            Debug.Log("Waiting for Grid to initialize...");
+            yield return new WaitForSeconds(0.1f);
+        }
+
         // Create AStarPathfinder if it doesn't exist
         if (pathfinder == null)
         {
@@ -40,13 +63,11 @@ public class PathfindingManager : MonoBehaviour
             simulator = simulatorObj.AddComponent<AStarSimulator>();
         }
 
-        // Find GridManager if not assigned
-        if (gridManager == null)
-        {
-            gridManager = FindObjectOfType<GridManager>();
-            if (gridManager == null)
-                Debug.LogError("GridManager not found in scene!");
-        }
+        // Wait one more frame to ensure everything is properly set up
+        yield return null;
+
+        IsInitialized = true;
+        Debug.Log("PathfindingManager initialization complete!");
     }
 
     public AStarPathfinder GetPathfinder()

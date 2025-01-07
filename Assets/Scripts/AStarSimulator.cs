@@ -7,6 +7,7 @@ public class AStarSimulator : MonoBehaviour
     public static AStarSimulator Instance { get; private set; }
     public AStarcrowdInstantiator instantiator;
     private List<AStarAgent> agents = new List<AStarAgent>();
+    private bool isInitialized = false;
 
     [Range(0.01f, 1f)]
     public float timestep = 0.016f;
@@ -25,9 +26,23 @@ public class AStarSimulator : MonoBehaviour
 
     void Start()
     {
-        if (instantiator == null) 
+        StartCoroutine(Initialize());
+    }
+
+    private IEnumerator Initialize()
+    {
+        // Wait for PathfindingManager to be initialized
+        while (PathfindingManager.Instance == null || !PathfindingManager.Instance.IsInitialized)
+        {
+            Debug.Log("AStarSimulator waiting for PathfindingManager...");
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        if (instantiator == null)
             instantiator = FindObjectOfType<AStarcrowdInstantiator>();
-        
+
+        isInitialized = true;
+        Debug.Log("AStarSimulator initialized successfully");
         StartCoroutine(SimulationCoroutine());
     }
 
@@ -36,6 +51,7 @@ public class AStarSimulator : MonoBehaviour
         if (!agents.Contains(agent))
         {
             agents.Add(agent);
+            Debug.Log($"Agent registered. Total agents: {agents.Count}");
         }
     }
 
@@ -43,7 +59,10 @@ public class AStarSimulator : MonoBehaviour
     {
         while (true)
         {
-            UpdateSimulation(timestep);
+            if (isInitialized)
+            {
+                UpdateSimulation(timestep);
+            }
             yield return new WaitForSeconds(timestep);
         }
     }
@@ -52,7 +71,11 @@ public class AStarSimulator : MonoBehaviour
     {
         foreach (AStarAgent agent in agents)
         {
+            if (agent == null) continue;
+
             AStarGoalManager goalManager = agent.GetComponent<AStarGoalManager>();
+            if (goalManager == null) continue;
+
             if (goalManager.IsGoalReached(agent))
             {
                 goalManager.AssignNewGoal(agent);
