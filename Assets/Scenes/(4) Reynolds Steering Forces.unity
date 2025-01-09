@@ -133,6 +133,7 @@ GameObject:
   - component: {fileID: 27921154}
   - component: {fileID: 27921153}
   - component: {fileID: 27921152}
+  - component: {fileID: 27921155}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -214,6 +215,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &27921155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 27921151}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7940d799c222c014cb39cfdea266c641, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leader: {fileID: 0}
+  heightAboveLeader: 20
+  distanceBehindLeader: 20
+  smoothSpeed: 0.2
+  lookAheadDistance: 0.5
 --- !u!1 &37920170
 GameObject:
   m_ObjectHideFlags: 0
@@ -322,7 +340,7 @@ GameObject:
   - component: {fileID: 137330754}
   m_Layer: 0
   m_Name: ObstacleCylinder (19)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -429,7 +447,7 @@ GameObject:
   - component: {fileID: 178994530}
   m_Layer: 0
   m_Name: ObstacleCylinder (7)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -536,7 +554,7 @@ GameObject:
   - component: {fileID: 236926692}
   m_Layer: 0
   m_Name: ObstacleCylinder (5)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -643,7 +661,7 @@ GameObject:
   - component: {fileID: 253164880}
   m_Layer: 0
   m_Name: ObstacleCylinder (10)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -748,7 +766,6 @@ GameObject:
   - component: {fileID: 298132189}
   - component: {fileID: 298132188}
   - component: {fileID: 298132187}
-  - component: {fileID: 298132191}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
@@ -843,22 +860,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &298132191
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 298132186}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26f7270f65b2ea94f8464c80e553366a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  leaderPrefab: {fileID: 9127730323235822338, guid: 1a47ab9efd74b024fbc585b099618807, type: 3}
-  followerPrefab: {fileID: 9127730323235822338, guid: dcc63bf3ef2b406478babb43f6ae2b15, type: 3}
-  goalPrefab: {fileID: 6589419003586092961, guid: f21f646be5e2f3c42bd5000537fa15be, type: 3}
-  followerCount: 5
 --- !u!1 &396414934
 GameObject:
   m_ObjectHideFlags: 0
@@ -873,7 +874,7 @@ GameObject:
   - component: {fileID: 396414936}
   m_Layer: 0
   m_Name: ObstacleCylinder (17)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -980,7 +981,7 @@ GameObject:
   - component: {fileID: 653556116}
   m_Layer: 0
   m_Name: ObstacleCylinder (15)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1087,7 +1088,7 @@ GameObject:
   - component: {fileID: 812382096}
   m_Layer: 0
   m_Name: ObstacleCylinder (12)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1194,7 +1195,7 @@ GameObject:
   - component: {fileID: 835096535}
   m_Layer: 0
   m_Name: ObstacleCylinder (1)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1301,7 +1302,7 @@ GameObject:
   - component: {fileID: 925036609}
   m_Layer: 0
   m_Name: ObstacleCylinder (18)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1408,7 +1409,7 @@ GameObject:
   - component: {fileID: 1015568628}
   m_Layer: 0
   m_Name: ObstacleCylinder (2)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1422,7 +1423,7 @@ Transform:
   m_GameObject: {fileID: 1015568626}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.0052395, y: 6.9336004, z: 5.431301}
+  m_LocalPosition: {x: -13.61, y: 6.9336004, z: -8.76}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1515,7 +1516,7 @@ GameObject:
   - component: {fileID: 1052554089}
   m_Layer: 0
   m_Name: ObstacleCylinder (16)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1622,7 +1623,7 @@ GameObject:
   - component: {fileID: 1083712014}
   m_Layer: 0
   m_Name: ObstacleCylinder (14)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1729,7 +1730,7 @@ GameObject:
   - component: {fileID: 1140542237}
   m_Layer: 0
   m_Name: ObstacleCylinder (3)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1833,7 +1834,7 @@ GameObject:
   - component: {fileID: 1148037919}
   m_Layer: 0
   m_Name: Obstacles
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1887,7 +1888,7 @@ GameObject:
   - component: {fileID: 1373080504}
   m_Layer: 0
   m_Name: ObstacleCylinder (6)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1994,7 +1995,7 @@ GameObject:
   - component: {fileID: 1400468785}
   m_Layer: 0
   m_Name: ObstacleCylinder (9)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2101,7 +2102,7 @@ GameObject:
   - component: {fileID: 1486535463}
   m_Layer: 0
   m_Name: ObstacleCylinder (13)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2208,7 +2209,7 @@ GameObject:
   - component: {fileID: 1677235886}
   m_Layer: 0
   m_Name: ObstacleCylinder (11)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2301,6 +2302,73 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1677235884}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1873925021
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1873925024}
+  - component: {fileID: 1873925023}
+  - component: {fileID: 1873925022}
+  m_Layer: 0
+  m_Name: ReynoldsSimulator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1873925022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1873925021}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4028d9dd2b15da14e99bb8710b272514, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leaderPrefab: {fileID: 9127730323235822338, guid: 1a47ab9efd74b024fbc585b099618807, type: 3}
+  followerPrefab: {fileID: 9127730323235822338, guid: dcc63bf3ef2b406478babb43f6ae2b15, type: 3}
+  numberOfFollowers: 5
+  spawnRadius: 5
+--- !u!114 &1873925023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1873925021}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8527db6a4c94564982158c6a9efeb9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  separationWeight: 0.5
+  alignmentWeight: 0.3
+  cohesionWeight: 0.4
+  slowingDistance: 5
+  lookAheadDistance: 5
+  cylinderRadius: 1
+--- !u!4 &1873925024
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1873925021}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.29, y: 1, z: 4.94}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1910701333
 GameObject:
   m_ObjectHideFlags: 0
@@ -2315,7 +2383,7 @@ GameObject:
   - component: {fileID: 1910701335}
   m_Layer: 0
   m_Name: ObstacleCylinder (8)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2422,7 +2490,7 @@ GameObject:
   - component: {fileID: 2146443139}
   m_Layer: 0
   m_Name: ObstacleCylinder (4)
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2567,6 +2635,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ObstacleCylinder
       objectReference: {fileID: 0}
+    - target: {fileID: 4250202536270560553, guid: e3b1b220b4caee446a931146203b2019, type: 3}
+      propertyPath: m_TagString
+      value: Obstacle
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2585,3 +2657,4 @@ SceneRoots:
   - {fileID: 37920172}
   - {fileID: 298132190}
   - {fileID: 1148037919}
+  - {fileID: 1873925024}
