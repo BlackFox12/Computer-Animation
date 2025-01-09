@@ -789,7 +789,7 @@ MeshCollider:
     m_Bits: 0
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
-  m_ProvidesContacts: 0
+  m_ProvidesContacts: 1
   m_Enabled: 1
   serializedVersion: 5
   m_Convex: 0
@@ -2334,7 +2334,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leaderPrefab: {fileID: 9127730323235822338, guid: 1a47ab9efd74b024fbc585b099618807, type: 3}
   followerPrefab: {fileID: 9127730323235822338, guid: dcc63bf3ef2b406478babb43f6ae2b15, type: 3}
-  numberOfFollowers: 5
+  numberOfFollowers: 20
   spawnRadius: 5
 --- !u!114 &1873925023
 MonoBehaviour:
@@ -2348,12 +2348,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8527db6a4c94564982158c6a9efeb9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  separationWeight: 0.5
-  alignmentWeight: 0.3
-  cohesionWeight: 0.4
-  slowingDistance: 5
+  separationWeight: 0.6
+  alignmentWeight: 0.2
+  cohesionWeight: 0.2
+  slowingDistance: 4
   lookAheadDistance: 5
-  cylinderRadius: 1
+  cylinderRadius: 1.5
 --- !u!4 &1873925024
 Transform:
   m_ObjectHideFlags: 0
@@ -2363,7 +2363,7 @@ Transform:
   m_GameObject: {fileID: 1873925021}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.29, y: 1, z: 4.94}
+  m_LocalPosition: {x: 0, y: 2, z: 6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

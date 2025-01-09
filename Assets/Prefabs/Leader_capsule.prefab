@@ -129,7 +129,7 @@ CapsuleCollider:
     m_Bits: 0
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
-  m_ProvidesContacts: 0
+  m_ProvidesContacts: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
@@ -149,12 +149,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isLeader: 1
-  maxSpeed: 5
+  maxSpeed: 7
   maxForce: 10
   mass: 1
   followDistance: 3
-  separationRadius: 2
+  separationRadius: 3
   alignmentRadius: 5
   cohesionRadius: 5
+  showDebugVisuals: 1
+  rayColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  cylinderColor: {r: 0, g: 1, b: 1, a: 1}
+  goalColor: {r: 0, g: 1, b: 0, a: 1}
   velocity: {x: 0, y: 0, z: 0}
   targetPosition: {x: 0, y: 0, z: 0}
+  debugRayPositions: []
+  debugRayHits: []
+  debugAvoidanceForce: {x: 0, y: 0, z: 0}
+  debugNearestObstacle: {x: 0, y: 0, z: 0}
+  debugCylinderLength: 0

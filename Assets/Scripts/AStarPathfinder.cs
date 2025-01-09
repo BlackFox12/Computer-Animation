@@ -5,10 +5,10 @@ using PathFinding;
 
 public class AStarPathfinder : MonoBehaviour
 {
-    private Grid grid;
-    private A_Star<GridCell, CellConnection, GridConnections, Grid, GridHeuristic> aStar;
-    private List<GridCell> lastPathCells;
-    private List<GridCell> visitedNodes = new List<GridCell>();
+    protected Grid grid;
+    protected A_Star<GridCell, CellConnection, GridConnections, Grid, GridHeuristic> aStar;
+    protected List<GridCell> lastPathCells;
+    protected List<GridCell> visitedNodes = new List<GridCell>();
     private bool isInitialized = false;
 
     void Start()
@@ -21,30 +21,30 @@ public class AStarPathfinder : MonoBehaviour
         // Wait for PathfindingManager to be initialized
         while (PathfindingManager.Instance == null || !PathfindingManager.Instance.IsInitialized)
         {
-            Debug.Log("AStarPathfinder waiting for PathfindingManager...");
+            Debug.Log($"{GetType().Name} waiting for PathfindingManager...");
             yield return new WaitForSeconds(0.1f);
         }
 
         GridManager gridManager = PathfindingManager.Instance.gridManager;
         while (gridManager == null || gridManager.GetGrid() == null)
         {
-            Debug.Log("AStarPathfinder waiting for Grid...");
+            Debug.Log($"{GetType().Name} waiting for Grid...");
             yield return new WaitForSeconds(0.1f);
             gridManager = PathfindingManager.Instance.gridManager;
         }
 
         grid = gridManager.GetGrid();
-        aStar = new A_Star<GridCell, CellConnection, GridConnections, Grid, GridHeuristic>(1000, 10f, 50);
+        InitializePathfinder();
         isInitialized = true;
-        Debug.Log("AStarPathfinder initialized successfully");
+        Debug.Log($"{GetType().Name} initialized successfully");
     }
 
-    public bool IsInitialized()
+    protected virtual void InitializePathfinder()
     {
-        return isInitialized && grid != null && aStar != null;
+        aStar = new A_Star<GridCell, CellConnection, GridConnections, Grid, GridHeuristic>(1000, 10f, 50);
     }
 
-    public List<Vector3> FindPath(int startIndex, int goalIndex)
+    public virtual List<Vector3> FindPath(int startIndex, int goalIndex)
     {
         if (!IsInitialized())
         {
@@ -91,6 +91,21 @@ public class AStarPathfinder : MonoBehaviour
         }
     }
 
+    public virtual bool IsInOpenSet(GridCell cell)
+    {
+        return aStar != null && aStar.IsInOpenSet(cell);
+    }
+
+    public virtual bool IsInClosedSet(GridCell cell)
+    {
+        return aStar != null && aStar.IsInClosedSet(cell);
+    }
+
+    public bool IsInitialized()
+    {
+        return isInitialized && grid != null && aStar != null;
+    }
+
     public List<GridCell> GetPathCells()
     {
         return lastPathCells ?? new List<GridCell>();
@@ -99,15 +114,5 @@ public class AStarPathfinder : MonoBehaviour
     public List<GridCell> GetVisitedNodes()
     {
         return visitedNodes;
-    }
-
-    public bool IsInOpenSet(GridCell cell)
-    {
-        return aStar != null && aStar.IsInOpenSet(cell);
-    }
-
-    public bool IsInClosedSet(GridCell cell)
-    {
-        return aStar != null && aStar.IsInClosedSet(cell);
     }
 } 

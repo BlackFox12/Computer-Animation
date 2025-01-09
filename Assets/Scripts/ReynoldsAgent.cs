@@ -30,6 +30,12 @@ public class ReynoldsAgent : MonoBehaviour
     public List<Vector3> debugRayPositions = new List<Vector3>();
     [HideInInspector]
     public List<Vector3> debugRayHits = new List<Vector3>();
+    [HideInInspector]
+    public Vector3 debugAvoidanceForce;
+    [HideInInspector]
+    public Vector3 debugNearestObstacle;
+    [HideInInspector]
+    public float debugCylinderLength;
 
     private void Start()
     {
@@ -49,11 +55,17 @@ public class ReynoldsAgent : MonoBehaviour
         velocity = Vector3.ClampMagnitude(velocity, maxSpeed);
         
         // Move
-        transform.position += velocity * Time.deltaTime;
+        Vector3 newPosition = transform.position + velocity * Time.deltaTime;
+        newPosition.y = 1f; // Force Y position to 1
+        transform.position = newPosition;
         
         // Rotate to face movement direction
         if (velocity.magnitude > 0.1f)
-            transform.forward = velocity.normalized;
+        {
+            Vector3 horizontalVelocity = velocity;
+            horizontalVelocity.y = 0f; // Ensure rotation is only in XZ plane
+            transform.forward = horizontalVelocity.normalized;
+        }
 
         // Check if leader reached goal
         if (isLeader && Vector3.Distance(transform.position, targetPosition) < 1f)
@@ -64,7 +76,7 @@ public class ReynoldsAgent : MonoBehaviour
     {
         targetPosition = new Vector3(
             Random.Range(-20f, 20f),
-            1f,
+            1f, // Set goal Y to 1
             Random.Range(-20f, 20f)
         );
     }
@@ -73,21 +85,24 @@ public class ReynoldsAgent : MonoBehaviour
     {
         if (!showDebugVisuals) return;
 
-        // Draw obstacle avoidance rays
-        if (debugRayPositions.Count > 0)
-        {
-            Gizmos.color = rayColor;
-            for (int i = 0; i < debugRayPositions.Count; i++)
-            {
-                Gizmos.DrawLine(debugRayPositions[i], debugRayHits[i]);
-            }
+        Vector3 forward = velocity.magnitude > 0.1f ? velocity.normalized : transform.forward;
 
-            // Draw cylinder wireframe
-            Gizmos.color = cylinderColor;
-            Vector3 forward = velocity.magnitude > 0.1f ? velocity.normalized : transform.forward;
-            DrawWireCylinder(transform.position, forward, 
-                ReynoldsSimulator.Instance.cylinderRadius, 
-                ReynoldsSimulator.Instance.lookAheadDistance);
+        // Draw avoidance cylinder
+        Gizmos.color = cylinderColor;
+        DrawWireCylinder(transform.position, forward, 
+            ReynoldsSimulator.Instance.cylinderRadius, 
+            debugCylinderLength);
+
+        // Draw avoidance force and nearest obstacle
+        if (debugAvoidanceForce != Vector3.zero)
+        {
+            // Draw force
+            Gizmos.color = Color.red;
+            Gizmos.DrawRay(transform.position, debugAvoidanceForce);
+
+            // Draw nearest obstacle connection
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(transform.position, debugNearestObstacle);
         }
 
         // Draw goal for leader
@@ -101,7 +116,13 @@ public class ReynoldsAgent : MonoBehaviour
 
     private void DrawWireCylinder(Vector3 position, Vector3 direction, float radius, float length)
     {
-        Vector3 forward = direction * length;
+        // Force position to y=1
+        position.y = 1f;
+        
+        Vector3 forward = direction;
+        forward.y = 0f; // Ensure cylinder is parallel to ground
+        forward = forward.normalized * length;
+        
         Vector3 up = Vector3.up;
         Vector3 right = Vector3.Cross(up, forward).normalized * radius;
         Vector3 start = position;

@@ -82,37 +82,77 @@ public class ReynoldsSimulator : MonoBehaviour
 
     private Vector3 ObstacleAvoidance(ReynoldsAgent agent)
     {
-        RaycastHit hit;
-        Vector3 rayDirection = agent.velocity.magnitude > 0.1f ? 
+        // Get movement direction
+        Vector3 forward = agent.velocity.magnitude > 0.1f ? 
             agent.velocity.normalized : 
             agent.transform.forward;
+
+        // Adjust cylinder length based on speed
+        float cylinderLength = lookAheadDistance * (agent.velocity.magnitude / agent.maxSpeed + 0.5f);
         
-        // Store hit points for visualization
-        agent.debugRayPositions.Clear();
-        agent.debugRayHits.Clear();
+        // Find all potential obstacles
+        Collider[] obstacles = Physics.OverlapSphere(
+            agent.transform.position + forward * cylinderLength * 0.5f, 
+            cylinderLength);
 
-        // Cast a cylinder (approximated by multiple raycasts)
-        for (float angle = 0; angle < 360; angle += 45)
+        Vector3 mostThreateningObstacle = Vector3.zero;
+        float nearestDistance = float.MaxValue;
+
+        foreach (Collider obstacle in obstacles)
         {
-            Vector3 rayStart = agent.transform.position + 
-                             Quaternion.Euler(0, angle, 0) * (agent.transform.right * cylinderRadius);
-            
-            agent.debugRayPositions.Add(rayStart);
-
-            if (Physics.Raycast(rayStart, rayDirection, out hit, lookAheadDistance))
+            if (obstacle.CompareTag("Obstacle"))
             {
-                agent.debugRayHits.Add(hit.point);
-                if (hit.collider.CompareTag("Obstacle"))
+                // Get closest point on forward axis
+                Vector3 directionToObstacle = obstacle.transform.position - agent.transform.position;
+                Vector3 projectedPoint = Vector3.Project(directionToObstacle, forward);
+                
+                // Check if obstacle is in front
+                if (Vector3.Dot(projectedPoint, forward) > 0)
                 {
-                    Vector3 lateral = Vector3.Cross(Vector3.up, rayDirection);
-                    return lateral * agent.maxForce;
+                    // Calculate distance from forward axis to obstacle center
+                    Vector3 lateralOffset = directionToObstacle - projectedPoint;
+                    float lateralDistance = lateralOffset.magnitude;
+
+                    // Check if within cylinder radius
+                    if (lateralDistance < cylinderRadius + obstacle.bounds.extents.x)
+                    {
+                        float distanceToObstacle = projectedPoint.magnitude;
+                        
+                        // Keep track of nearest threatening obstacle
+                        if (distanceToObstacle < nearestDistance)
+                        {
+                            nearestDistance = distanceToObstacle;
+                            mostThreateningObstacle = obstacle.transform.position;
+                        }
+                    }
                 }
             }
-            else
-            {
-                agent.debugRayHits.Add(rayStart + rayDirection * lookAheadDistance);
-            }
         }
+
+        // If we found a threatening obstacle, compute avoidance force
+        if (mostThreateningObstacle != Vector3.zero)
+        {
+            // Project obstacle position onto lateral plane
+            Vector3 directionToObstacle = mostThreateningObstacle - agent.transform.position;
+            Vector3 lateralDirection = directionToObstacle - Vector3.Project(directionToObstacle, forward);
+            
+            // Calculate avoidance direction (negative lateral direction)
+            Vector3 avoidanceDirection = -lateralDirection.normalized;
+            
+            // Scale force based on distance and speed
+            float forceMagnitude = agent.maxForce * (1.0f - nearestDistance / cylinderLength);
+            
+            // Store debug info for visualization
+            agent.debugAvoidanceForce = avoidanceDirection * forceMagnitude;
+            agent.debugNearestObstacle = mostThreateningObstacle;
+            agent.debugCylinderLength = cylinderLength;
+            
+            return avoidanceDirection * forceMagnitude;
+        }
+
+        agent.debugAvoidanceForce = Vector3.zero;
+        agent.debugNearestObstacle = Vector3.zero;
+        agent.debugCylinderLength = cylinderLength;
         
         return Vector3.zero;
     }
