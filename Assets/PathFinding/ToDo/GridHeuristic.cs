@@ -23,6 +23,12 @@ public class GridHeuristic : Heuristic<GridCell>
         Vector3 goalPos = goalNode.center;
         return Vector3.Distance(fromPos, goalPos);
     }
+    public override float estimateCost(GridCell fromNode, GridCell toNode)
+    {
+        Vector3 fromPos = fromNode.center;
+        Vector3 toPos = toNode.center;
+        return Vector3.Distance(fromPos, toPos);
+    }
 
     // determines if the goal node has been reached by node
     public override bool goalReached(GridCell node)

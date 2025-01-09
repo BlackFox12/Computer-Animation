@@ -18,6 +18,7 @@ namespace PathFinding{
 
 		// generates an estimated cost to reach the stored goal from the given node
 		public abstract float estimateCost(TNode fromNode);
+		public abstract float estimateCost(TNode fromNode, TNode toNode);
 
 		// determines if the goal node has been reached by node
 		public abstract bool goalReached (TNode node);

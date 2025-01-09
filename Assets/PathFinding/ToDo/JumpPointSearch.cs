@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace PathFinding
 {
-    public class JumpPointSearch<TNode, TConnection, TNodeConnection, TGraph, THeuristic> 
+    public class JumpPointSearch<TNode, TConnection, TNodeConnection, TGraph, THeuristic>
         : A_Star<TNode, TConnection, TNodeConnection, TGraph, THeuristic>
         where TNode : Node
         where TConnection : Connection<TNode>
@@ -18,6 +18,7 @@ namespace PathFinding
 
         public override List<TNode> findpath(TGraph graph, TNode start, TNode end, THeuristic heuristic, ref int found)
         {
+            Debug.Log($"Starting JPS pathfinding from {(start as GridCell).center} to {(end as GridCell).center}");
             // Clear previous search data
             visitedNodes.Clear();
             allNodes.Clear();
@@ -50,15 +51,14 @@ namespace PathFinding
 
                 closedSet.Add(current.node);
 
-                // Instead of checking all neighbors, identify and process jump points
                 foreach (var connection in graph.getConnections(current.node).connections)
                 {
-                    TNode jumpPoint = FindJumpPoint(graph, current.node, connection.getToNode(), end);
-                    
+                    TNode jumpPoint = IdentifyJumpPoint(graph, current.node, connection.getToNode(), end);
+
                     if (jumpPoint == null || closedSet.Contains(jumpPoint))
                         continue;
 
-                    float jumpPointCost = CalculateJumpPointCost(current.node, jumpPoint);
+                    float jumpPointCost = heuristic.estimateCost(current.node, jumpPoint);
                     float tentativeGCost = current.gCost + jumpPointCost;
 
                     if (!allNodes.ContainsKey(jumpPoint))
@@ -93,76 +93,58 @@ namespace PathFinding
             return new List<TNode>();
         }
 
-        private TNode FindJumpPoint(TGraph graph, TNode current, TNode direction, TNode goal)
+        private TNode IdentifyJumpPoint(TGraph graph, TNode current, TNode direction, TNode goal)
         {
             GridCell currentCell = current as GridCell;
             GridCell directionCell = direction as GridCell;
             GridCell goalCell = goal as GridCell;
-            
+
             if (currentCell == null || directionCell == null || goalCell == null)
                 return null;
 
-            // Calculate direction vector
             Vector3 dir = (directionCell.center - currentCell.center).normalized;
             int dx = Mathf.RoundToInt(dir.x);
             int dz = Mathf.RoundToInt(dir.z);
-
-            // Current position in grid coordinates
             Vector3 currentPos = currentCell.center;
-            
-            while (true)
+
+            // Add maximum steps to prevent infinite loops
+            int maxSteps = 100;  // Adjust based on your grid size
+            int steps = 0;
+
+            while (steps < maxSteps)
             {
-                // Move to next position
+                steps++;
                 currentPos += new Vector3(dx * currentCell.cellSize, 0, dz * currentCell.cellSize);
-                
-                // Get the cell at the new position
+
                 TNode nextNode = FindCellAtPosition(graph, currentPos);
                 if (nextNode == null || (nextNode as GridCell).IsOccupied)
                     return null;
 
-                // Check if we found the goal
+                // Add the node to visited nodes for visualization
+                if (!visitedNodes.Contains(nextNode))
+                    visitedNodes.Add(nextNode);
+
                 if (nextNode.Equals(goal))
                     return nextNode;
 
-                // Check for forced neighbors
                 if (HasForcedNeighbors(graph, nextNode as GridCell, dx, dz))
                     return nextNode;
 
-                // If moving diagonally, check both cardinal directions
+                // Diagonal movement checks
                 if (dx != 0 && dz != 0)
                 {
-                    // Check horizontal jump point
-                    TNode horizontalJump = FindJumpPoint(graph, nextNode, 
-                        FindCellAtPosition(graph, currentPos + new Vector3(dx * currentCell.cellSize, 0, 0)), 
-                        goal);
-                    if (horizontalJump != null)
-                        return nextNode;
+                    // Check horizontal and vertical directions
+                    TNode horizontalJump = IdentifyJumpPoint(graph, nextNode,
+                        FindCellAtPosition(graph, currentPos + new Vector3(dx * currentCell.cellSize, 0, 0)), goal);
+                    
+                    TNode verticalJump = IdentifyJumpPoint(graph, nextNode,
+                        FindCellAtPosition(graph, currentPos + new Vector3(0, 0, dz * currentCell.cellSize)), goal);
 
-                    // Check vertical jump point
-                    TNode verticalJump = FindJumpPoint(graph, nextNode, 
-                        FindCellAtPosition(graph, currentPos + new Vector3(0, 0, dz * currentCell.cellSize)), 
-                        goal);
-                    if (verticalJump != null)
+                    if (horizontalJump != null || verticalJump != null)
                         return nextNode;
                 }
             }
-        }
 
-        private TNode FindCellAtPosition(TGraph graph, Vector3 position)
-        {
-            // Start from any node and use connections to traverse
-            foreach (var connection in graph.getConnections(allNodes.Keys.First()).connections)
-            {
-                GridCell cell = connection.getToNode() as GridCell;
-                if (cell != null && 
-                    position.x >= cell.center.x - cell.cellSize/2 && 
-                    position.x <= cell.center.x + cell.cellSize/2 &&
-                    position.z >= cell.center.z - cell.cellSize/2 && 
-                    position.z <= cell.center.z + cell.cellSize/2)
-                {
-                    return connection.getToNode();
-                }
-            }
             return null;
         }
 
@@ -170,35 +152,26 @@ namespace PathFinding
         {
             if (current == null) return false;
 
-            // For horizontal movement
-            if (dz == 0 && dx != 0)
+            // Reduce the required number of clear neighbors
+            int requiredClearNeighbors = 2;  // Changed from 3
+            int clearNeighbors = 0;
+
+            // Check all eight directions
+            for (int x = -1; x <= 1; x++)
             {
-                // Check cells above and below
-                bool topBlocked = IsCellBlocked(graph, current.center + new Vector3(0, 0, current.cellSize));
-                bool bottomBlocked = IsCellBlocked(graph, current.center + new Vector3(0, 0, -current.cellSize));
-                
-                return (topBlocked && !IsCellBlocked(graph, current.center + new Vector3(dx * current.cellSize, 0, current.cellSize))) ||
-                       (bottomBlocked && !IsCellBlocked(graph, current.center + new Vector3(dx * current.cellSize, 0, -current.cellSize)));
-            }
-            
-            // For vertical movement
-            if (dx == 0 && dz != 0)
-            {
-                // Check cells left and right
-                bool leftBlocked = IsCellBlocked(graph, current.center + new Vector3(-current.cellSize, 0, 0));
-                bool rightBlocked = IsCellBlocked(graph, current.center + new Vector3(current.cellSize, 0, 0));
-                
-                return (leftBlocked && !IsCellBlocked(graph, current.center + new Vector3(-current.cellSize, 0, dz * current.cellSize))) ||
-                       (rightBlocked && !IsCellBlocked(graph, current.center + new Vector3(current.cellSize, 0, dz * current.cellSize)));
-            }
-            
-            // For diagonal movement
-            if (dx != 0 && dz != 0)
-            {
-                return HasForcedNeighbors(graph, current, dx, 0) || HasForcedNeighbors(graph, current, 0, dz);
+                for (int z = -1; z <= 1; z++)
+                {
+                    if (x == 0 && z == 0) continue;
+
+                    Vector3 neighborPos = current.center + new Vector3(x * current.cellSize, 0, z * current.cellSize);
+                    if (!IsCellBlocked(graph, neighborPos))
+                    {
+                        clearNeighbors++;
+                    }
+                }
             }
 
-            return false;
+            return clearNeighbors >= requiredClearNeighbors;
         }
 
         private bool IsCellBlocked(TGraph graph, Vector3 position)
@@ -207,44 +180,19 @@ namespace PathFinding
             return node == null || (node as GridCell).IsOccupied;
         }
 
-        private float CalculateJumpPointCost(TNode from, TNode to)
+        private TNode FindCellAtPosition(TGraph graph, Vector3 position)
         {
-            GridCell fromCell = from as GridCell;
-            GridCell toCell = to as GridCell;
-            
-            if (fromCell == null || toCell == null)
-                return float.MaxValue;
-
-            // Calculate the actual distance between the cells
-            Vector3 diff = toCell.center - fromCell.center;
-            float dx = Mathf.Abs(diff.x);
-            float dz = Mathf.Abs(diff.z);
-
-            // If moving diagonally, use diagonal distance formula
-            if (dx > 0 && dz > 0)
+            foreach (var node in (graph as Grid).nodes)
             {
-                float diagonal = Mathf.Min(dx, dz);
-                float straight = Mathf.Abs(dx - dz);
-                return diagonal * 1.414f + straight; // 1.414 is approximately sqrt(2)
+                GridCell cell = node as GridCell;
+                if (cell != null &&
+                    Mathf.Abs(position.x - cell.center.x) <= cell.cellSize / 2 &&
+                    Mathf.Abs(position.z - cell.center.z) <= cell.cellSize / 2)
+                {
+                    return node as TNode;
+                }
             }
-            
-            // If moving straight, use Manhattan distance
-            return dx + dz;
-        }
-
-        protected List<TNode> BuildPath(NodeRecord endRecord)
-        {
-            List<TNode> path = new List<TNode>();
-            NodeRecord current = endRecord;
-
-            while (current != null)
-            {
-                path.Add(current.node);
-                current = current.parent;
-            }
-
-            path.Reverse();
-            return path;
+            return null;
         }
     }
-} 
+}
