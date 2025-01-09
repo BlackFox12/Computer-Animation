@@ -103,7 +103,7 @@ namespace PathFinding
             return new List<TNode>();
         }
 
-        private List<TNode> BuildPath(NodeRecord endRecord)
+        protected List<TNode> BuildPath(NodeRecord endRecord)
         {
             List<TNode> path = new List<TNode>();
             NodeRecord current = endRecord;
